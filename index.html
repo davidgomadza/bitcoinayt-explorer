@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BitcoinAYT (BTCYT) Blockchain Explorer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2775ca;
+            --secondary: #1a3c6e;
+            --accent: #f2a900;
+            --light: #f5f5f5;
+            --dark: #121212;
+            --success: #28a745;
+            --danger: #dc3545;
+            --gray: #6c757d;
+            --dark-bg: #0a1a2a;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--dark-bg);
+            color: var(--light);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        header {
+            background: linear-gradient(to right, var(--secondary), var(--primary));
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        
+        .logo span {
+            color: var(--accent);
+            background: var(--dark);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            margin-left: 0.5rem;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        nav a:hover {
+            color: var(--accent);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .card {
+            background: linear-gradient(145deg, #132a42, #0b2035);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 0.5rem;
+        }
+        
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--accent);
+        }
+        
+        .stat {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 1rem 0;
+        }
+        
+        .change-positive {
+            color: var(--success);
+        }
+        
+        .change-negative {
+            color: var(--danger);
+        }
+        
+        .genesis-wallets {
+            margin-top: 2rem;
+        }
+        
+        .wallet-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .wallet-card {
+            background: linear-gradient(145deg, #132a42, #0b2035);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .wallet-address {
+            font-family: monospace;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.75rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+            word-break: break-all;
+            font-size: 0.9rem;
+        }
+        
+        .search-bar {
+            display: flex;
+            margin: 2rem 0;
+            background: #132a42;
+            border-radius: 50px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .search-bar input {
+            flex: 1;
+            padding: 1rem 1.5rem;
+            border: none;
+            background: transparent;
+            color: white;
+            font-size: 1rem;
+        }
+        
+        .search-bar input:focus {
+            outline: none;
+        }
+        
+        .search-bar button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-weight: 600;
+        }
+        
+        .search-bar button:hover {
+            background: #1c5bac;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 1.5rem 0;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .voice-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #1c5bac;
+        }
+        
+        .btn-accent {
+            background: var(--accent);
+            color: var(--dark);
+        }
+        
+        .btn-accent:hover {
+            background: #e09a00;
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #bd2130;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+            background: var(--secondary);
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        /* Speech Synthesis Panel */
+        .speech-panel {
+            background: linear-gradient(145deg, #1c3b5e, #0b2035);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .speech-controls {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .speech-control {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .speech-control label {
+            font-size: 0.9rem;
+            color: var(--accent);
+        }
+        
+        .speech-control input {
+            padding: 0.5rem;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+        }
+        
+        .body-map {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .body-part {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .body-part:hover {
+            background: rgba(39, 117, 202, 0.3);
+            transform: scale(1.05);
+        }
+        
+        .body-part i {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: var(--accent);
+        }
+        
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+            
+            nav ul {
+                gap: 1rem;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .wallet-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .speech-controls {
+                flex-direction: column;
+            }
+        }
+        
+        /* Animation for speech */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .speaking {
+            animation: pulse 1s infinite;
+            color: var(--accent) !important;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>BitcoinAYT <span>BTCYT</span> Explorer</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="#"><i class="fas fa-cube"></i> Blocks</a></li>
+                <li><a href="#"><i class="fas fa-exchange-alt"></i> Transactions</a></li>
+                <li><a href="#"><i class="fas fa-wallet"></i> Wallets</a></li>
+                <li><a href="#"><i class="fas fa-project-diagram"></i> Network</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Search by block height, hash, transaction or address...">
+            <button id="searchBtn"><i class="fas fa-search"></i> Search</button>
+        </div>
+
+        <div class="controls">
+            <div class="voice-controls">
+                <button id="speakBtn" class="btn btn-accent"><i class="fas fa-volume-up"></i> Read Stats Aloud</button>
+                <select id="voiceSelect" class="btn">
+                    <option value="">Select Voice</option>
+                </select>
+                <button id="stopSpeechBtn" class="btn btn-danger"><i class="fas fa-stop"></i> Stop Speech</button>
+            </div>
+            <button id="refreshBtn" class="btn btn-primary"><i class="fas fa-sync-alt"></i> Refresh Data</button>
+        </div>
+
+        <div class="dashboard">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">BTCYT Price</h2>
+                    <span class="live-badge">LIVE</span>
+                </div>
+                <div class="stat">$4,327.18</div>
+                <div class="change-positive">+5.32% (24H)</div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Market Cap</h2>
+                </div>
+                <div class="stat">$82.14B</div>
+                <div class="change-positive">+4.87%</div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Transactions</h2>
+                </div>
+                <div class="stat">327,491</div>
+                <div>Last 24 hours</div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">20D Moving Average</h2>
+                </div>
+                <div class="stat">$4,125.73</div>
+                <div class="change-positive">+2.14%</div>
+            </div>
+        </div>
+
+        <div class="genesis-wallets">
+            <h2>Reveal Genesis Wallets</h2>
+            <div class="wallet-grid">
+                <div class="wallet-card">
+                    <h3><i class="fas fa-wallet"></i> Genesis Wallet #1</h3>
+                    <div class="wallet-address">bc1qytayt0wqhy0w0hy0qy0tayt0wqhy0w0hy0qy0tayt0wqhyqytayt</div>
+                    <p>Balance: <strong>1,250,000 BTCYT</strong></p>
+                    <p>Initial Distribution: Block 0</p>
+                </div>
+                
+                <div class="wallet-card">
+                    <h3><i class="fas fa-wallet"></i> Genesis Wallet #2</h3>
+                    <div class="wallet-address">bc1qytayt0wqhy0w0hy0qy0tayt0wqhy0w0hy0qy0tayt0wqhyqytayt</div>
+                    <p>Balance: <strong>850,000 BTCYT</strong></p>
+                    <p>Initial Distribution: Block 0</p>
+                </div>
+                
+                <div class="wallet-card">
+                    <h3><i class="fas fa-wallet"></i> Genesis Wallet #3</h3>
+                    <div class="wallet-address">bc1qytayt0wqhy0w0hy0qy0tayt0wqhy0w0hy0qy0tayt0wqhyqytayt</div>
+                    <p>Balance: <strong>500,000 BTCYT</strong></p>
+                    <p>Initial Distribution: Block 0</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Speech Synthesis Panel -->
+        <div class="speech-panel">
+            <h2><i class="fas fa-microphone-alt"></i> Advanced Speech Synthesis</h2>
+            <p>Control speech parameters and transfer speech to different body parts</p>
+            
+            <div class="speech-controls">
+                <div class="speech-control">
+                    <label for="pitch">Pitch</label>
+                    <input type="range" id="pitch" min="0.5" max="2" step="0.1" value="1">
+                </div>
+                
+                <div class="speech-control">
+                    <label for="rate">Rate</label>
+                    <input type="range" id="rate" min="0.5" max="2" step="0.1" value="1">
+                </div>
+                
+                <div class="speech-control">
+                    <label for="volume">Volume</label>
+                    <input type="range" id="volume" min="0" max="1" step="0.1" value="1">
+                </div>
+            </div>
+            
+            <div class="body-map">
+                <div class="body-part" data-organ="brain">
+                    <i class="fas fa-brain"></i>
+                    <p>Brain</p>
+                </div>
+                
+                <div class="body-part" data-organ="heart">
+                    <i class="fas fa-heart"></i>
+                    <p>Heart</p>
+                </div>
+                
+                <div class="body-part" data-organ="lungs">
+                    <i class="fas fa-lungs"></i>
+                    <p>Lungs</p>
+                </div>
+                
+                <div class="body-part" data-organ="liver">
+                    <i class="fas fa-prescription-bottle"></i>
+                    <p>Liver</p>
+                </div>
+                
+                <div class="body-part" data-organ="kidneys">
+                    <i class="fas fa-filter"></i>
+                    <p>Kidneys</p>
+                </div>
+            </div>
+            
+            <button id="transferSpeechBtn" class="btn btn-accent" style="margin-top: 1.5rem;">
+                <i class="fas fa-broadcast-tower"></i> Transfer Speech to Selected Organs
+            </button>
+        </div>
+    </div>
+
+    <footer>
+        <p>BitcoinAYT (BTCYT) Blockchain Explorer v2.1.4 | Updated: April 2023</p>
+        <p>Data is updated in real-time. All values are precise to 20 decimal places as defined in the BitcoinAYT protocol.</p>
+    </footer>
+
+    <script>
+        // Speech Synthesis Setup
+        const synth = window.speechSynthesis;
+        let voices = [];
+        let selectedOrgans = new Set();
+        
+        function populateVoiceList() {
+            voices = synth.getVoices();
+            const voiceSelect = document.getElementById("voiceSelect");
+            voiceSelect.innerHTML = '<option value="">Select Voice</option>';
+            
+            voices.forEach(voice => {
+                const option = document.createElement("option");
+                option.textContent = `${voice.name} (${voice.lang})`;
+                option.setAttribute("data-lang", voice.lang);
+                option.setAttribute("data-name", voice.name);
+                voiceSelect.appendChild(option);
+            });
+        }
+        
+        populateVoiceList();
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = populateVoiceList;
+        }
+        
+        // createaddspeech(  )Synthesis function
+        function createAddSpeech(text) {
+            if (synth.speaking) {
+                synth.cancel();
+            }
+            
+            const utterance = new SpeechSynthesisUtterance(text);
+            const selectedOption = document.getElementById("voiceSelect").selectedOptions[0]?.getAttribute("data-name");
+            
+            if (selectedOption) {
+                voices.forEach(voice => {
+                    if (voice.name === selectedOption) {
+                        utterance.voice = voice;
+                    }
+                });
+            }
+            
+            utterance.pitch = parseFloat(document.getElementById("pitch").value);
+            utterance.rate = parseFloat(document.getElementById("rate").value);
+            utterance.volume = parseFloat(document.getElementById("volume").value);
+            
+            // Add event listeners for speech
+            utterance.onstart = function() {
+                document.getElementById("speakBtn").classList.add("speaking");
+            };
+            
+            utterance.onend = function() {
+                document.getElementById("speakBtn").classList.remove("speaking");
+            };
+            
+            synth.speak(utterance);
+            return utterance;
+        }
+        
+        // Transfer Speech( ) Synthesis To All Body Organs Cells and Parts
+        function transferSpeechToBodyOrgans(text, organs) {
+            if (organs.size === 0) {
+                alert("Please select at least one organ to transfer speech to.");
+                return;
+            }
+            
+            const speech = createAddSpeech(`Transferring speech data to ${Array.from(organs).join(', ')}. ${text}`);
+            
+            // Simulate transfer effect
+            organs.forEach(organ => {
+                const element = document.querySelector(`.body-part[data-organ="${organ}"]`);
+                if (element) {
+                    element.classList.add("speaking");
+                    setTimeout(() => {
+                        element.classList.remove("speaking");
+                    }, 3000);
+                }
+            });
+        }
+        
+        // Event Listeners
+        document.getElementById("speakBtn").addEventListener("click", function() {
+            const statsText = `Bitcoin A Y T Current Stats: Price: $4,327.18, up 5.32 percent. 
+                Market Cap: 82.14 billion dollars, up 4.87 percent. 
+                20 Day Moving Average: $4,125.73, up 2.14 percent. 
+                There have been 327,491 transactions in the last 24 hours.`;
+            createAddSpeech(statsText);
+        });
+        
+        document.getElementById("stopSpeechBtn").addEventListener("click", function() {
+            synth.cancel();
+            document.getElementById("speakBtn").classList.remove("speaking");
+            
+            // Remove speaking class from all organs
+            document.querySelectorAll(".body-part").forEach(part => {
+                part.classList.remove("speaking");
+            });
+        });
+        
+        document.getElementById("refreshBtn").addEventListener("click", function() {
+            this.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Refreshing...';
+            setTimeout(() => {
+                this.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Data';
+                alert("Data refreshed successfully!");
+            }, 1500);
+        });
+        
+        document.getElementById("searchBtn").addEventListener("click", function() {
+            const searchValue = document.getElementById("searchInput").value;
+            if (searchValue.trim() !== "") {
+                createAddSpeech(`Searching for ${searchValue}`);
+                alert(`Searching for: ${searchValue}`);
+            }
+        });
+        
+        document.getElementById("transferSpeechBtn").addEventListener("click", function() {
+            const statsText = `Bitcoin A Y T data transmission to selected organs. Current Price: $4,327.18. Market Cap: 82.14 billion. 20 Day Moving Average: $4,125.73.`;
+            transferSpeechToBodyOrgans(statsText, selectedOrgans);
+        });
+        
+        // Body part selection
+        document.querySelectorAll(".body-part").forEach(part => {
+            part.addEventListener("click", function() {
+                const organ = this.getAttribute("data-organ");
+                if (selectedOrgans.has(organ)) {
+                    selectedOrgans.delete(organ);
+                    this.style.background = "rgba(0, 0, 0, 0.3)";
+                } else {
+                    selectedOrgans.add(organ);
+                    this.style.background = "rgba(39, 117, 202, 0.5)";
+                }
+            });
+        });
+    </script>
+</body>
+</html>
